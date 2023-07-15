@@ -2,25 +2,21 @@ import random
 import pygame
 
 # Sizing Game
-Nx = int(9)
-Ny = int(9)
-Ngo = int(5)
+Nx = int(9)  # Maximum X pos
+Ny = int(9)  # Maximum Y pos
+Ngo = int(25)  # How many Game Objects
 
 # Graphic const
 RED = 255, 0, 0
 GREEN = 0, 255, 0
 BLUE = 0, 0, 255
 
-RCOLOR = RED
-PCOLOR = GREEN
-SCOLOR = BLUE
 CIRCLE_RADIUS = 10
 
 # Initializing the game
-goType = Ngo * [None]
-goXpos = Ngo * [None]
-goYpos = Ngo * [None]
-
+goType = Ngo * [0]
+goXpos = Ngo * [0]
+goYpos = Ngo * [0]
 
 # Initializing display
 WIDTH = 1000
@@ -30,14 +26,13 @@ pygame.display.set_caption("Mark Segal-----------RSP")
 
 # populating Game
 for ii, go in enumerate(goType):
-    goType[ii] = 'R'
+    goType[ii] = random.randint(1, 3)
     goXpos[ii] = random.randint(0, Nx)
     goYpos[ii] = random.randint(0, Ny)
 
 print(goXpos)
 print(goYpos)
 print(goType)
-
 
 # Display Game
 while True:
@@ -49,7 +44,14 @@ while True:
     # Draw game objects
     for ii, go in enumerate(goType):
         position = (100 * goXpos[ii], 100 * goYpos[ii])
-        pygame.draw.circle(window, RCOLOR, position, CIRCLE_RADIUS)
+        if goType[ii] == 1:
+            color = RED
+        elif goType[ii] == 2:
+            color = GREEN
+        else:
+            color = BLUE
+
+        pygame.draw.circle(window, color, position, CIRCLE_RADIUS)
         pygame.display.flip()  # Update the display
     # Test position
     # pygame.draw.circle(window, PCOLOR, (0, 0), CIRCLE_RADIUS)
