@@ -6,7 +6,7 @@ import time
 # Sizing Game
 Nx = int(900)  # Maximum X pos
 Ny = int(900)  # Maximum Y pos
-Ngo = int(300)  # How many Game Objects
+Ngo = int(200)  # How many Game Objects
 
 # Graphic const
 RED = 255, 0, 0
@@ -14,8 +14,9 @@ GREEN = 0, 255, 0
 BLUE = 0, 0, 255
 BLACK = 0, 0, 0
 GREY = 128, 128, 128
+WHITE = 255, 255, 255
 CIRCLE_RADIUS = 5
-COLLISION_THRASHOLD = 10 * CIRCLE_RADIUS
+COLLISION_THRASHOLD = CIRCLE_RADIUS * 10
 VELNX = -7
 VELPX = 7
 VELNY = -4
@@ -34,12 +35,19 @@ goType = Ngo * [0]
 goXpos = Ngo * [0]
 goYpos = Ngo * [0]
 
+# Variables for Statistics
+num_r = 0
+num_p = 0
+num_s = 0
+iter_count = 0
+
 # Initializing display
-WIDTH = 1000
+WIDTH = 1200
 HEIGHT = 1000
 window = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Mark Segal-----------RSP")
 
+pygame.init()
 # populating Game
 for ii, go in enumerate(goType):
     goType[ii] = random.randint(ROCK, SCISSORS)
@@ -50,13 +58,25 @@ for ii, go in enumerate(goType):
 goXpos_old = goXpos.copy()
 goYpos_old = goYpos.copy()
 
-print(goXpos)
-print(goYpos)
-print(goType)
+
+# Statistics
+def display_statistics(mywin, r, p, s):
+    font = pygame.font.Font(None, 30)
+    stat1_text = font.render("Rock: {}".format(r), True, RED)
+    stat2_text = font.render("Paper: {}".format(p), True, GREEN)
+    stat3_text = font.render("Scissors: {}".format(s), True, BLUE)
+
+    pygame.draw.rect(window, BLACK, pygame.Rect(1000, 10, 140, 80))
+    pygame.display.update(1000, 10, 140, 80)
+
+    mywin.blit(stat1_text, (1000, 10))
+    mywin.blit(stat2_text, (1000, 40))
+    mywin.blit(stat3_text, (1000, 70))
+
 
 # Display Game
 while True:
-    #time.sleep(0.05)
+    # time.sleep(0.05)
     clock.tick(120)
     # Handle events
     for event in pygame.event.get():
@@ -70,10 +90,13 @@ while True:
         position = (1 * goXpos[ii], 1 * goYpos[ii])
         if goType[ii] == ROCK:
             color = RED
+            num_r = num_r + 1
         elif goType[ii] == PAPER:
             color = GREEN
+            num_p = num_p + 1
         elif goType[ii] == SCISSORS:
             color = BLUE
+            num_s = num_s + 1
         else:
             color = BLACK
 
@@ -94,6 +117,17 @@ while True:
             CIRCLE_RADIUS * 2,
             CIRCLE_RADIUS * 2
         )
+    # end of loop that draws all circles
+
+    # Displaying Statistics
+    iter_count = iter_count + 1
+    if iter_count == 5:
+        display_statistics(window, num_r, num_p, num_s)
+        iter_count = 0
+
+    num_r = 0
+    num_p = 0
+    num_s = 0
 
     # Moving objects
     for ii, go in enumerate(goType):
@@ -112,18 +146,17 @@ while True:
         if goYpos[ii] < 0:
             goYpos[ii] = Ny
 
-
         for jj, other in enumerate(goType):
             # Computing distance
-            dist = math.sqrt((goXpos[jj] - goXpos[ii])**2 + (goYpos[jj] - goYpos[ii])**2)
+            dist = math.sqrt((goXpos[jj] - goXpos[ii]) ** 2 + (goYpos[jj] - goYpos[ii]) ** 2)
             # if goXpos[ii] == goXpos[jj] and goYpos[ii] == goYpos[jj]: # Checking exact position
             if dist < COLLISION_THRASHOLD:
                 if goType[ii] == ROCK and goType[jj] == PAPER:
                     goType[ii] = PAPER
-                    print("R <- P at " + str(goXpos[ii]) + "," + str(goYpos[ii]))
+                    # print("R <- P at " + str(goXpos[ii]) + "," + str(goYpos[ii]))
                 if goType[ii] == ROCK and goType[jj] == SCISSORS:
                     goType[jj] = ROCK
-                    print("R -> S at " + str(goXpos[ii]) + "," + str(goYpos[ii]))
+                    # print("R -> S at " + str(goXpos[ii]) + "," + str(goYpos[ii]))
                 if goType[ii] == SCISSORS and goType[jj] == PAPER:
                     goType[jj] = SCISSORS
                 if goType[ii] == SCISSORS and goType[jj] == ROCK:
@@ -133,10 +166,7 @@ while True:
                 if goType[ii] == PAPER and goType[jj] == ROCK:
                     goType[jj] = PAPER
 
-
-
-
-
+    # end of loop that moves and deletes circles
 
     # Test position
     # pygame.draw.circle(window, PCOLOR, (0, 0), CIRCLE_RADIUS)
